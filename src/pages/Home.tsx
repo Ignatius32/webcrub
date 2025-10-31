@@ -1,7 +1,10 @@
 import { useEffect, useState } from 'react'
+import { useLocation } from 'react-router-dom'
 import { fetchPortadaPrincipals, fetchNovedades, type Novedad } from '@/services/strapi'
 import { withBaseURL } from '@/utils/urls'
 import { Link } from 'react-router-dom'
+import { BookOpen, UsersRound, Briefcase, Award } from 'lucide-react'
+import AgendaHome from '@/components/AgendaHome'
 
 export type StrapiImageFormat = {
   url: string
@@ -26,6 +29,7 @@ export type PortadaPrincipal = {
   titulo?: string | null
   subtitulo?: string | null
   url?: string | null
+  duration?: number | null
   createdAt?: string
   updatedAt?: string
   publishedAt?: string
@@ -33,6 +37,7 @@ export type PortadaPrincipal = {
 }
 
 export function Home() {
+  const location = useLocation() as { state?: { anchor?: string } }
   const [items, setItems] = useState<PortadaPrincipal[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -59,6 +64,42 @@ export function Home() {
       active = false
     }
   }, [])
+
+  // If we were navigated with an anchor state, scroll to that element smoothly
+  useEffect(() => {
+    const anchor = location.state?.anchor
+    if (!anchor) return
+    const t = setTimeout(() => {
+      const el = document.getElementById(anchor)
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    }, 0)
+    return () => clearTimeout(t)
+  }, [location.state])
+
+  // Determine autoplay duration per item
+  function getItemDurationMs(it: PortadaPrincipal | undefined): number {
+    const DEFAULT_MS = 8000 // 8s fallback
+    if (!it) return DEFAULT_MS
+    const v = it.duration
+    if (v == null || !isFinite(v as number) || Number(v) <= 0) return DEFAULT_MS
+    const num = Number(v)
+    // If value looks like milliseconds (>= 1000), use as-is; otherwise treat as seconds
+    const ms = num >= 1000 ? num : num * 1000
+    // Clamp to a reasonable range (1s - 10m)
+    return Math.max(1000, Math.min(ms, 10 * 60 * 1000))
+  }
+
+  // Autoplay: advance after each item's configured duration
+  useEffect(() => {
+    if (items.length <= 1) return
+    const current = items.length ? items[idx % items.length] : undefined
+    const ms = getItemDurationMs(current)
+    const t = setTimeout(() => {
+      setIdx((i) => (i + 1) % (items.length || 1))
+    }, ms)
+    return () => clearTimeout(t)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [idx, items.length])
 
   if (loading) return <p className="status">Cargando…</p>
   if (error) return <p className="status error">Error: {error}</p>
@@ -88,6 +129,7 @@ export function Home() {
     const next = (idx + delta + items.length) % items.length
     setIdx(next)
   }
+
 
   function onTouchStart(e: React.TouchEvent) {
     setTouchStartX(e.touches[0].clientX)
@@ -176,6 +218,43 @@ export function Home() {
           </ul>
         )}
       </section>
+        <section className="container quick-links">
+          <ul className="ql-list" aria-label="Accesos rápidos">
+            <li>
+              <Link to="/estudiantes" className="ql-item ql-estudiantes">
+                <span className="ql-icon" aria-hidden>
+                  <BookOpen size={36} strokeWidth={2} />
+                </span>
+                <span className="ql-label">Estudiantes</span>
+              </Link>
+            </li>
+            <li>
+              <Link to="/docentes" className="ql-item ql-docentes">
+                <span className="ql-icon" aria-hidden>
+                  <UsersRound size={36} strokeWidth={2} />
+                </span>
+                <span className="ql-label">Docentes</span>
+              </Link>
+            </li>
+            <li>
+              <Link to="/nodocentes" className="ql-item ql-nodocentes">
+                <span className="ql-icon" aria-hidden>
+                  <Briefcase size={36} strokeWidth={2} />
+                </span>
+                <span className="ql-label">Nodocentes</span>
+              </Link>
+            </li>
+            <li>
+              <Link to="/personas-graduadas" className="ql-item ql-graduadas">
+                <span className="ql-icon" aria-hidden>
+                  <Award size={36} strokeWidth={2} />
+                </span>
+                <span className="ql-label">Personas graduadas</span>
+              </Link>
+            </li>
+          </ul>
+        </section>
+      <AgendaHome />
     </main>
   )
 }

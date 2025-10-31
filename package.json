@@ -10,6 +10,7 @@
     "fetch:portada": "node ./scripts/fetch-strapi.mjs '/portada-principals?populate=*'"
   },
   "dependencies": {
+    "lucide-react": "^0.447.0",
     "react-markdown": "^9.0.3",
     "remark-gfm": "^4.0.0",
     "rehype-raw": "^7.0.0",
