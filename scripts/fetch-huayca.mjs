@@ -35,7 +35,8 @@ const TOKEN = process.env.HUAYCA_TOKEN || process.env.STRAPI_TOKEN || process.en
 
 // Path can be passed as argument to override the default endpoint
 const [, , rawPath] = process.argv
-const thePath = rawPath || '/Menu-p-investigacion-items?populate=*'
+// Default to the new endpoint
+const thePath = rawPath || '/menu-ppls?populate=*'
 
 const url = `${API.replace(/\/$/, '')}${thePath.startsWith('/') ? '' : '/'}${thePath}`
 
