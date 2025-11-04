@@ -1,64 +1,27 @@
 import { useEffect, useState } from 'react'
 import { useLocation } from 'react-router-dom'
-import { fetchPortadaPrincipals, fetchNovedades, type Novedad } from '@/services/strapi'
+import { fetchNovedades, type Novedad, loadHomeHeroItems } from '@/services/strapi'
 import { withBaseURL } from '@/utils/urls'
 import { Link } from 'react-router-dom'
 import { BookOpen, UsersRound, Briefcase, Award } from 'lucide-react'
 import AgendaHome from '@/components/AgendaHome'
-
-export type StrapiImageFormat = {
-  url: string
-  width?: number
-  height?: number
-}
-
-export type StrapiImage = {
-  url: string
-  alternativeText?: string | null
-  formats?: {
-    thumbnail?: StrapiImageFormat
-    small?: StrapiImageFormat
-    medium?: StrapiImageFormat
-    large?: StrapiImageFormat
-  }
-}
-
-export type PortadaPrincipal = {
-  id: number
-  documentId?: string
-  titulo?: string | null
-  subtitulo?: string | null
-  url?: string | null
-  duration?: number | null
-  createdAt?: string
-  updatedAt?: string
-  publishedAt?: string
-  imagen?: StrapiImage | null
-}
+import Hero from '@/components/Hero'
 
 export function Home() {
   const location = useLocation() as { state?: { anchor?: string } }
-  const [items, setItems] = useState<PortadaPrincipal[]>([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
-  const [idx, setIdx] = useState(0)
-  const [touchStartX, setTouchStartX] = useState<number | null>(null)
   const [novedades, setNovedades] = useState<Novedad[]>([])
 
   useEffect(() => {
     let active = true
-    Promise.all([fetchPortadaPrincipals(), fetchNovedades()])
-      .then(([list, novs]) => {
+    Promise.all([fetchNovedades()])
+      .then(([novs]) => {
         if (!active) return
-        setItems(list)
         setNovedades(novs)
       })
       .catch((e: unknown) => {
         const msg = e instanceof Error ? e.message : 'Unknown error'
-        setError(msg)
-      })
-      .finally(() => {
-        if (active) setLoading(false)
+        // eslint-disable-next-line no-console
+        console.error('Error loading novedades', msg)
       })
     return () => {
       active = false
@@ -76,122 +39,9 @@ export function Home() {
     return () => clearTimeout(t)
   }, [location.state])
 
-  // Determine autoplay duration per item
-  function getItemDurationMs(it: PortadaPrincipal | undefined): number {
-    const DEFAULT_MS = 8000 // 8s fallback
-    if (!it) return DEFAULT_MS
-    const v = it.duration
-    if (v == null || !isFinite(v as number) || Number(v) <= 0) return DEFAULT_MS
-    const num = Number(v)
-    // If value looks like milliseconds (>= 1000), use as-is; otherwise treat as seconds
-    const ms = num >= 1000 ? num : num * 1000
-    // Clamp to a reasonable range (1s - 10m)
-    return Math.max(1000, Math.min(ms, 10 * 60 * 1000))
-  }
-
-  // Autoplay: advance after each item's configured duration
-  useEffect(() => {
-    if (items.length <= 1) return
-    const current = items.length ? items[idx % items.length] : undefined
-    const ms = getItemDurationMs(current)
-    const t = setTimeout(() => {
-      setIdx((i) => (i + 1) % (items.length || 1))
-    }, ms)
-    return () => clearTimeout(t)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [idx, items.length])
-
-  if (loading) return <p className="status">Cargando…</p>
-  if (error) return <p className="status error">Error: {error}</p>
-
-  if (items.length === 0) {
-    return (
-      <main className="container">
-        <p>No hay elementos</p>
-      </main>
-    )
-  }
-
-  const item = items[idx % items.length]
-  const title = item.titulo ?? `Item #${item.id}`
-  const desc = item.subtitulo ?? ''
-  const candidate =
-    item.imagen?.formats?.large?.url ||
-    item.imagen?.formats?.medium?.url ||
-    item.imagen?.formats?.small?.url ||
-    item.imagen?.url || null
-  const imgUrl = candidate ? withBaseURL(candidate) : null
-  const alt = item.imagen?.alternativeText ?? title
-  const href = item.url && item.url.trim() ? normalizeUrl(item.url.trim()) : null
-
-  function go(delta: number) {
-    if (!items.length) return
-    const next = (idx + delta + items.length) % items.length
-    setIdx(next)
-  }
-
-
-  function onTouchStart(e: React.TouchEvent) {
-    setTouchStartX(e.touches[0].clientX)
-  }
-  function onTouchEnd(e: React.TouchEvent) {
-    if (touchStartX == null) return
-    const dx = e.changedTouches[0].clientX - touchStartX
-    const threshold = 40 // px
-    if (Math.abs(dx) > threshold) {
-      go(dx < 0 ? 1 : -1)
-    }
-    setTouchStartX(null)
-  }
-
-  function onMouseDown(e: React.MouseEvent) {
-    setTouchStartX(e.clientX)
-  }
-  function onMouseUp(e: React.MouseEvent) {
-    if (touchStartX == null) return
-    const dx = e.clientX - touchStartX
-    const threshold = 40
-    if (Math.abs(dx) > threshold) {
-      go(dx < 0 ? 1 : -1)
-    }
-    setTouchStartX(null)
-  }
-
   return (
     <main>
-      <section className="hero">
-        <div
-          className="hero-media"
-          onTouchStart={onTouchStart}
-          onTouchEnd={onTouchEnd}
-          onMouseDown={onMouseDown}
-          onMouseUp={onMouseUp}
-        >
-          {imgUrl && (
-            <img key={imgUrl} className="hero-img fade-img" src={imgUrl} alt={alt} />
-          )}
-          <span className="badge">Portada principal</span>
-          <button type="button" className="nav prev" aria-label="Anterior" onClick={() => go(-1)} hidden={items.length <= 1}>
-            ‹
-          </button>
-          <button type="button" className="nav next" aria-label="Siguiente" onClick={() => go(1)} hidden={items.length <= 1}>
-            ›
-          </button>
-          <div className="hero-overlay" />
-          <div key={idx} className="hero-content fade-text">
-            {href ? (
-              <h1>
-                <a href={href} target="_blank" rel="noreferrer noopener">
-                  {title}
-                </a>
-              </h1>
-            ) : (
-              <h1>{title}</h1>
-            )}
-            {desc && <p className="subtitle">{desc}</p>}
-          </div>
-        </div>
-      </section>
+      <Hero loadItems={loadHomeHeroItems} badge="Portada principal" />
 
       <section className="container novedades">
         <h2>Novedades</h2>
@@ -259,9 +109,4 @@ export function Home() {
   )
 }
 
-// moved to utils/urls
-
-function normalizeUrl(u: string) {
-  if (/^https?:\/\//i.test(u)) return u
-  return `https://${u}`
-}
+// normalizeUrl moved to utils/urls
