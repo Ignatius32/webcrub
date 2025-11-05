@@ -8,11 +8,13 @@ import NoDocentes from './pages/NoDocentes'
 import PersonasGraduadas from './pages/PersonasGraduadas'
 import AgendaList from './pages/AgendaList'
 import AgendaDetail from './pages/AgendaDetail'
+import Header from './components/Header'
 
 export default function App() {
   return (
-    <BrowserRouter>
+    <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
       <div className="app">
+        <Header />
         <ScrollToHash />
         <Routes>
           <Route path="/" element={<Home />} />

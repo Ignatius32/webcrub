@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
+import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { HeroItem } from '@/types/hero'
 
 type Props = {
@@ -98,10 +99,10 @@ export default function Hero({ items: itemsProp, loadItems, badge = 'Hero', clas
         )}
         {badge && <span className="badge">{badge}</span>}
         <button type="button" className="nav prev" aria-label="Anterior" onClick={() => go(-1)} hidden={items.length <= 1}>
-          ‹
+          <ChevronLeft size={56} />
         </button>
         <button type="button" className="nav next" aria-label="Siguiente" onClick={() => go(1)} hidden={items.length <= 1}>
-          ›
+          <ChevronRight size={56} />
         </button>
         <div className="hero-overlay" />
         <div key={idx} className="hero-content fade-text">

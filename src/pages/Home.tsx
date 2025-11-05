@@ -41,7 +41,7 @@ export function Home() {
 
   return (
     <main>
-      <Hero loadItems={loadHomeHeroItems} badge="Portada principal" />
+      <Hero loadItems={loadHomeHeroItems} badge="" />
 
       <section className="container novedades">
         <h2>Novedades</h2>
