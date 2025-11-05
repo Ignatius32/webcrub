@@ -1,3 +1,48 @@
+# Huayca Frontend (Vite + React)
+
+## Notas
+- Asegurá que CORS en Strapi permita http://localhost:5173.
+- Para contenido draft/publish, publicá las entradas o usá un token con permisos suficientes.
+
+## Modo de header (overlay vs solid)
+
+El header soporta dos modos visuales que cada página puede activar en tiempo de ejecución:
+
+- overlay (por defecto): el header se superpone sobre el contenido superior.
+- solid: el header se muestra con fondo sólido (p. ej., para páginas de detalle).
+
+Cómo funciona:
+
+- La app envuelve las rutas con `HeaderModeProvider` (ver `src/App.tsx`).
+- El `Header` lee el modo actual con `useHeaderMode()` y agrega la clase `solid` cuando corresponde.
+- Las páginas pueden fijar el modo usando el hook de conveniencia `useHeaderStyle`.
+
+Uso en una página:
+
+```tsx
+import { useHeaderStyle } from '@/components/headerMode'
+
+export default function MiPagina() {
+	useHeaderStyle('solid')
+	// ... contenido de la página
+}
+```
+
+Opcional: forzar overlay explícitamente
+
+```tsx
+import { useHeaderStyle } from '@/components/headerMode'
+
+export default function OtraPagina() {
+	useHeaderStyle('overlay')
+	// ... contenido de la página
+}
+```
+
+Notas:
+
+- Al desmontar, `useHeaderStyle` restaura automáticamente `overlay` salvo que otro componente montado establezca un modo distinto.
+- Ejemplos existentes: `NovedadDetail`, `Pagina` y `Seccion` usan `solid`.
 # Sitio web del Centro Regional Universitario Bariloche (UNCo)
 
 Proyecto frontend moderno construido con Vite + React, que consume contenido desde Strapi mediante una capa de servicios modular.

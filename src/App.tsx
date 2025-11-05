@@ -10,6 +10,8 @@ import AgendaList from './pages/AgendaList'
 import AgendaDetail from './pages/AgendaDetail'
 import Header from './components/Header'
 import { HeaderModeProvider } from './components/headerMode'
+import Pagina from './pages/Pagina'
+import Seccion from './pages/Seccion'
 
 export default function App() {
   return (
@@ -28,6 +30,8 @@ export default function App() {
           <Route path="/docentes" element={<Docentes />} />
           <Route path="/nodocentes" element={<NoDocentes />} />
           <Route path="/personas-graduadas" element={<PersonasGraduadas />} />
+          <Route path="/pagina/:slug" element={<Pagina />} />
+          <Route path="/pagina/:slug/seccion/:sid" element={<Seccion />} />
           </Routes>
         </div>
       </HeaderModeProvider>

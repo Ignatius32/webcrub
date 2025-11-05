@@ -1,0 +1,66 @@
+{
+  "data": [
+    {
+      "id": 3,
+      "documentId": "ghikrdl4iz9bqn4iw4n10now",
+      "title": "Ingreso",
+      "createdAt": "2025-11-05T14:31:12.701Z",
+      "updatedAt": "2025-11-05T15:03:24.553Z",
+      "publishedAt": "2025-11-05T15:03:24.694Z",
+      "subtitle": "Inscribite para estudiar en el CRUB!",
+      "url": null,
+      "orden": 0,
+      "estilo": "caja",
+      "contenido": "Este es el megacontenido dentro de la pagina de ingreso, deberia mostrar el listado de secciones para poder clikear y ver el detalle de cada una",
+      "slug": "ingreso",
+      "secciones": [
+        {
+          "id": 5,
+          "title": "Ingreso 2026",
+          "content": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "text": "aca sabes todo de como ingresar",
+                  "type": "text"
+                }
+              ]
+            }
+          ],
+          "orden": 0,
+          "estilo": "caja",
+          "subtitle": "ingresá al camino de la excelencia",
+          "url": null
+        },
+        {
+          "id": 6,
+          "title": "Ingreso +25",
+          "content": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "text": "si sos +25 y no terminaste el secundario, no pasa nada! Podes ingresar igual...",
+                  "type": "text"
+                }
+              ]
+            }
+          ],
+          "orden": 1,
+          "estilo": "plain",
+          "subtitle": "siempre hay tiempo para empezar!",
+          "url": "www.google.com"
+        }
+      ]
+    }
+  ],
+  "meta": {
+    "pagination": {
+      "page": 1,
+      "pageSize": 25,
+      "pageCount": 1,
+      "total": 1
+    }
+  }
+}

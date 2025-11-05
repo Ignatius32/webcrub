@@ -112,3 +112,43 @@ npm run fetch:huayca
 
 - Ensure Strapi CORS allows http://localhost:5173.
 - For draft/publish content, publish entries or use a token with sufficient permissions.
+
+## Header mode (overlay vs solid)
+
+The header supports two visual modes that pages can switch at runtime:
+
+- overlay (default): header overlays the top content.
+- solid: header renders with a solid background (e.g., for detail pages).
+
+How it works:
+
+- The app wraps routes with `HeaderModeProvider` (see `src/App.tsx`).
+- The `Header` reads the current mode via `useHeaderMode()` and toggles the `solid` class.
+- Pages can set the desired mode using the convenience hook `useHeaderStyle`.
+
+Usage on a page component:
+
+```tsx
+import { useHeaderStyle } from '@/components/headerMode'
+
+export default function MyPage() {
+	useHeaderStyle('solid')
+	// ... page content
+}
+```
+
+Optional: keep overlay explicitly
+
+```tsx
+import { useHeaderStyle } from '@/components/headerMode'
+
+export default function MyOtherPage() {
+	useHeaderStyle('overlay')
+	// ... page content
+}
+```
+
+Notes:
+
+- On unmount, `useHeaderStyle` automatically restores `overlay` unless another mounted component sets a different mode.
+- Existing examples: `NovedadDetail`, `Pagina`, and `Seccion` set the header to `solid`.
