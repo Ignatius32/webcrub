@@ -9,14 +9,16 @@ import PersonasGraduadas from './pages/PersonasGraduadas'
 import AgendaList from './pages/AgendaList'
 import AgendaDetail from './pages/AgendaDetail'
 import Header from './components/Header'
+import { HeaderModeProvider } from './components/headerMode'
 
 export default function App() {
   return (
     <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
-      <div className="app">
-        <Header />
-        <ScrollToHash />
-        <Routes>
+      <HeaderModeProvider>
+        <div className="app">
+          <Header />
+          <ScrollToHash />
+          <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/novedades/:slug" element={<NovedadDetail />} />
           <Route path="/novedades/id/:id" element={<NovedadDetail />} />
@@ -26,8 +28,9 @@ export default function App() {
           <Route path="/docentes" element={<Docentes />} />
           <Route path="/nodocentes" element={<NoDocentes />} />
           <Route path="/personas-graduadas" element={<PersonasGraduadas />} />
-        </Routes>
-      </div>
+          </Routes>
+        </div>
+      </HeaderModeProvider>
     </BrowserRouter>
   )
 }

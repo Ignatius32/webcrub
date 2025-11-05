@@ -6,8 +6,10 @@ import remarkGfm from 'remark-gfm'
 import rehypeRaw from 'rehype-raw'
 import rehypeSanitize from 'rehype-sanitize'
 import { withBaseURL } from '@/utils/urls'
+import { useHeaderStyle } from '@/components/headerMode'
 
 export function NovedadDetail() {
+  useHeaderStyle('solid')
   const { slug, id } = useParams()
   const [item, setItem] = useState<Novedad | null>(null)
   const [loading, setLoading] = useState(true)

@@ -2,13 +2,15 @@ import { useEffect, useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import * as MenuService from '@/services/strapi/menu'
 import type { MenuGroup } from '@/services/strapi/menu'
-import { Menu as MenuIcon, X, ChevronDown } from 'lucide-react'
+import { Menu as MenuIcon, X, Undo2 } from 'lucide-react'
+import { useHeaderMode } from './headerMode'
 
 export default function Header() {
   const [menuGroups, setMenuGroups] = useState<MenuGroup[]>([])
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [openDropdown, setOpenDropdown] = useState<string | null>(null)
   const location = useLocation()
+  const { mode } = useHeaderMode()
 
   useEffect(() => {
     let active = true
@@ -53,7 +55,7 @@ export default function Header() {
   }
 
   return (
-    <header className="header">
+    <header className={`header ${mode === 'solid' ? 'solid' : ''}`}>
       <div className="header-container">
         <button 
           className="menu-toggle" 
@@ -75,10 +77,21 @@ export default function Header() {
                   onClick={() => toggleDropdown(group.titulo)}
                 >
                   {group.titulo}
-                  <ChevronDown size={16} />
                 </button>
                 <div className={`dropdown ${openDropdown === group.titulo ? 'open' : ''}`}>
                   <div className="dropdown-content">
+                    {/* Mobile-only header bar with selected group title and back arrow */}
+                    <div className="dropdown-header">
+                      <div className="dropdown-title">{group.titulo}</div>
+                      <button
+                        type="button"
+                        className="dropdown-back"
+                        aria-label="Volver al menú principal"
+                        onClick={() => setOpenDropdown(null)}
+                      >
+                        <Undo2 size={18} />
+                      </button>
+                    </div>
                     {(group.sections || []).map((section) => (
                       <div key={section.id} className="dropdown-section">
                         <div className="section-title">{section.titulo}</div>
