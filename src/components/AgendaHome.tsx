@@ -25,40 +25,50 @@ export default function AgendaHome() {
   }, [])
 
   return (
-    <section id="agenda" className="container agenda-home">
-      <div className="section-header">
-        <h2>Agenda</h2>
-        <Link to="/agenda" className="see-all">Ver todas</Link>
+    <section id="agenda" className="agenda-home">
+      <div className="agenda-video-bg">
+        <video autoPlay loop muted playsInline poster="/img/bg-agenda.jpg">
+          <source src="/video/agenda.mp4" type="video/mp4" />
+          <source src="/video/agenda.webm" type="video/webm" />
+          <source src="/video/agenda.ogv" type="video/ogg" />
+        </video>
+        <div className="agenda-overlay"></div>
       </div>
-      {loading && <p className="status">Cargando…</p>}
-      {error && <p className="status error">{error}</p>}
-      {!loading && !error && (
-        items.length === 0 ? (
-          <p>No hay actividades en el próximo mes</p>
-        ) : (
-          <ul className="agenda-cols">
-            {chunkPairs(items).map((pair, colIdx) => (
-              <li key={colIdx} className="agenda-col">
-                <ul className="agenda-col-list">
-                  {pair.map((a) => (
-                    <li key={a.id} className={`agenda-item estado-${a.estado}`}>
-                      <Link to={`/agenda/${a.id}`} state={{ from: 'home' }} className="agenda-link">
-                        <div className="agenda-date">
-                          <time dateTime={a.datetime}>{formatDateTime(a.datetime)}</time>
-                        </div>
-                        <div className="agenda-info">
-                          <h3 className="agenda-title">{a.titulo}</h3>
-                          <p className="agenda-meta">{a.espacio} • {a.estado.replace('_', ' ')}</p>
-                        </div>
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-              </li>
-            ))}
-          </ul>
-        )
-      )}
+      <div className="agenda-content">
+        <div className="section-header">
+          <h2>Agenda</h2>
+          <Link to="/agenda" className="see-all">Ver todas</Link>
+        </div>
+        {loading && <p className="status">Cargando…</p>}
+        {error && <p className="status error">{error}</p>}
+        {!loading && !error && (
+          items.length === 0 ? (
+            <p>No hay actividades en el próximo mes</p>
+          ) : (
+            <ul className="agenda-cols">
+              {chunkPairs(items).map((pair, colIdx) => (
+                <li key={colIdx} className="agenda-col">
+                  <ul className="agenda-col-list">
+                    {pair.map((a) => (
+                      <li key={a.id} className={`agenda-item estado-${a.estado}`}>
+                        <Link to={`/agenda/${a.id}`} state={{ from: 'home' }} className="agenda-link">
+                          <div className="agenda-date">
+                            <time dateTime={a.datetime}>{formatDateTime(a.datetime)}</time>
+                          </div>
+                          <div className="agenda-info">
+                            <h3 className="agenda-title">{a.titulo}</h3>
+                            <p className="agenda-meta">{a.espacio} • {a.estado.replace('_', ' ')}</p>
+                          </div>
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                </li>
+              ))}
+            </ul>
+          )
+        )}
+      </div>
     </section>
   )
 }

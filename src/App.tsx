@@ -9,16 +9,22 @@ import PersonasGraduadas from './pages/PersonasGraduadas'
 import AgendaList from './pages/AgendaList'
 import AgendaDetail from './pages/AgendaDetail'
 import Header from './components/Header'
+import Footer from './components/Footer'
+import NewsletterParallax from './components/NewsletterParallax'
+import FloatingMenuButton from './components/FloatingMenuButton'
 import { HeaderModeProvider } from './components/headerMode'
+import { MenuProvider } from './components/menuContext'
 import Pagina from './pages/Pagina'
 import Seccion from './pages/Seccion'
 
 export default function App() {
   return (
     <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
-      <HeaderModeProvider>
+      <MenuProvider>
+        <HeaderModeProvider>
         <div className="app">
           <Header />
+          <FloatingMenuButton />
           <ScrollToHash />
           <Routes>
           <Route path="/" element={<Home />} />
@@ -33,8 +39,11 @@ export default function App() {
           <Route path="/pagina/:slug" element={<Pagina />} />
           <Route path="/pagina/:slug/seccion/:sid" element={<Seccion />} />
           </Routes>
+          <NewsletterParallax />
+          <Footer />
         </div>
       </HeaderModeProvider>
+      </MenuProvider>
     </BrowserRouter>
   )
 }

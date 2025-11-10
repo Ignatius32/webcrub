@@ -4,11 +4,15 @@ import * as MenuService from '@/services/strapi/menu'
 import type { MenuGroup } from '@/services/strapi/menu'
 import { Menu as MenuIcon, X, Undo2 } from 'lucide-react'
 import { useHeaderMode } from './headerMode'
+import { useMenu } from './menuContext'
 
 export default function Header() {
+  const { isMenuOpen, setIsMenuOpen } = useMenu()
   const [menuGroups, setMenuGroups] = useState<MenuGroup[]>([])
-  const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [openDropdown, setOpenDropdown] = useState<string | null>(null)
+  const [isVisible, setIsVisible] = useState(true)
+  const [hasScrolled, setHasScrolled] = useState(false)
+  const [lastScrollY, setLastScrollY] = useState(0)
   const location = useLocation()
   const { mode } = useHeaderMode()
 
@@ -26,6 +30,33 @@ export default function Header() {
       active = false
     }
   }, [])
+
+  // Handle scroll behavior
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY
+      
+      if (currentScrollY < 10) {
+        // Always show header at the top
+        setIsVisible(true)
+        setHasScrolled(false)
+      } else if (currentScrollY < lastScrollY) {
+        // Scrolling up
+        setIsVisible(true)
+        setHasScrolled(true)
+      } else if (currentScrollY > lastScrollY) {
+        // Scrolling down
+        setIsVisible(false)
+        setHasScrolled(true)
+        setOpenDropdown(null) // Close any open dropdown
+      }
+      
+      setLastScrollY(currentScrollY)
+    }
+
+    window.addEventListener('scroll', handleScroll, { passive: true })
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [lastScrollY])
 
   // Close mobile menu when route changes
   useEffect(() => {
@@ -55,8 +86,12 @@ export default function Header() {
   }
 
   return (
-    <header className={`header ${mode === 'solid' ? 'solid' : ''}`}>
+    <header className={`header ${mode === 'solid' ? 'solid' : ''} ${!isVisible ? 'hidden' : ''} ${hasScrolled && isVisible ? 'scrolled' : ''}`}>
       <div className="header-container">
+        <Link to="/" className="header-logo">
+          <img src={hasScrolled && isVisible ? "/logo2.png" : "/logo3.png"} alt="CRUB" />
+        </Link>
+
         <button 
           className="menu-toggle" 
           onClick={() => setIsMenuOpen(!isMenuOpen)}
