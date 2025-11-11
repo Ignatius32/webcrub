@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import * as MenuService from '@/services/strapi/menu'
 import type { MenuGroup } from '@/services/strapi/menu'
-import { Menu as MenuIcon, X, Undo2 } from 'lucide-react'
+import { Menu as MenuIcon, X, Undo2, Search } from 'lucide-react'
 import { useHeaderMode } from './headerMode'
 import { useMenu } from './menuContext'
 
@@ -10,6 +10,8 @@ export default function Header() {
   const { isMenuOpen, setIsMenuOpen } = useMenu()
   const [menuGroups, setMenuGroups] = useState<MenuGroup[]>([])
   const [openDropdown, setOpenDropdown] = useState<string | null>(null)
+  const [isSearchOpen, setIsSearchOpen] = useState(false)
+  const [searchAnim, setSearchAnim] = useState(false)
   const [isVisible, setIsVisible] = useState(true)
   const [hasScrolled, setHasScrolled] = useState(false)
   const [lastScrollY, setLastScrollY] = useState(0)
@@ -62,7 +64,46 @@ export default function Header() {
   useEffect(() => {
     setIsMenuOpen(false)
     setOpenDropdown(null)
+    setIsSearchOpen(false)
   }, [location])
+
+  // When a desktop dropdown is open, add a body class to blur background
+  useEffect(() => {
+    const hasDesktopDropdown = openDropdown && window.matchMedia('(min-width: 769px)').matches
+    if (hasDesktopDropdown) {
+      document.body.classList.add('menu-blur')
+    } else {
+      document.body.classList.remove('menu-blur')
+    }
+    return () => {
+      document.body.classList.remove('menu-blur')
+    }
+  }, [openDropdown])
+
+  // When desktop search is open, reuse blur effect like dropdown
+  useEffect(() => {
+    const isDesktop = window.matchMedia('(min-width: 769px)').matches
+    if (isDesktop && isSearchOpen) {
+      document.body.classList.add('menu-blur')
+    } else {
+      document.body.classList.remove('menu-blur')
+    }
+    return () => {
+      document.body.classList.remove('menu-blur')
+    }
+  }, [isSearchOpen])
+
+  // Apply body class to offset content when header is solid (non-home pages)
+  useEffect(() => {
+    if (mode === 'solid') {
+      document.body.classList.add('solid-header-active')
+    } else {
+      document.body.classList.remove('solid-header-active')
+    }
+    return () => {
+      document.body.classList.remove('solid-header-active')
+    }
+  }, [mode])
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -81,7 +122,25 @@ export default function Header() {
     }
   }, [openDropdown])
 
+  // Close search when clicking outside the search pill
+  useEffect(() => {
+    if (!isSearchOpen) return
+
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as HTMLElement
+      if (target.closest('.nav-searchbar')) return
+      setIsSearchOpen(false)
+    }
+
+    document.addEventListener('click', handleClickOutside, true)
+    return () => {
+      document.removeEventListener('click', handleClickOutside, true)
+    }
+  }, [isSearchOpen])
+
   const toggleDropdown = (titulo: string) => {
+    // closing search if opening a dropdown
+    if (openDropdown !== titulo) setIsSearchOpen(false)
     setOpenDropdown(openDropdown === titulo ? null : titulo)
   }
 
@@ -89,7 +148,7 @@ export default function Header() {
     <header className={`header ${mode === 'solid' ? 'solid' : ''} ${!isVisible ? 'hidden' : ''} ${hasScrolled && isVisible ? 'scrolled' : ''}`}>
       <div className="header-container">
         <Link to="/" className="header-logo">
-          <img src={hasScrolled && isVisible ? "/logo2.png" : "/logo3.png"} alt="CRUB" />
+          <img src={mode === 'solid' ? "/logo2.png" : (hasScrolled && isVisible ? "/logo2.png" : "/logo3.png")} alt="CRUB" />
         </Link>
 
         <button 
@@ -100,7 +159,7 @@ export default function Header() {
           {isMenuOpen ? <X size={24} /> : <MenuIcon size={24} />}
         </button>
 
-        <nav className={`header-nav ${isMenuOpen ? 'open' : ''}`}>
+        <nav className={`header-nav ${isMenuOpen ? 'open' : ''} ${isSearchOpen ? 'search-open' : ''}`}>
           <ul className="nav-list">
             {menuGroups.map((group) => (
               <li 
@@ -163,8 +222,43 @@ export default function Header() {
                 </div>
               </li>
             ))}
+            {/* searchbar renders outside the list; keep list lean */}
           </ul>
         </nav>
+        {/* Desktop search trigger aligned to screen right */}
+        {!isSearchOpen && (
+          <button
+            type="button"
+            className="header-search-btn"
+            aria-label="Buscar"
+            onClick={() => {
+              setIsSearchOpen(true)
+              setOpenDropdown(null)
+              setSearchAnim(true)
+              window.setTimeout(() => setSearchAnim(false), 250)
+            }}
+          >
+            <Search size={20} />
+          </button>
+        )}
+        {isSearchOpen && (
+          <div className={`nav-searchbar ${searchAnim ? 'animating' : ''}`}>
+            <input
+              type="search"
+              className="nav-search-input"
+              placeholder="Buscar…"
+              autoFocus
+            />
+            <button
+              type="button"
+              className="nav-search-toggle"
+              aria-label="Cerrar búsqueda"
+              onClick={() => setIsSearchOpen(false)}
+            >
+              <X size={18} />
+            </button>
+          </div>
+        )}
       </div>
     </header>
   )

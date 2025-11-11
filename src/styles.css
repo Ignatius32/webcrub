@@ -3,17 +3,44 @@
 body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Noto Sans,sans-serif;line-height:1.4;background:var(--bg);color:var(--fg)}
 .app{min-height:100vh;background:var(--bg);color:var(--fg)}
 
+/* Desktop: menu focus mode (no direct blur on elements to avoid edge halos) */
+@media (min-width: 769px) {
+	/* Fade underlying content instead of blurring directly */
+	body.menu-blur .app > :not(header) {
+		opacity: 0.35;
+		transition: opacity 160ms ease;
+		pointer-events: none; /* prevent interactions behind menu */
+	}
+	/* Backdrop filtering overlay for soft blur without halo at edges */
+	body.menu-blur .app::after {
+		content: "";
+		position: fixed;
+		inset: 0;
+		backdrop-filter: blur(10px) saturate(0.7);
+		-webkit-backdrop-filter: blur(10px) saturate(0.7);
+		background: rgba(0,0,0,0.25);
+		z-index: 99; /* below header (100), above faded content */
+		pointer-events: none;
+	}
+}
+
+/* Offset content when solid header is active (non-home pages) */
+body.solid-header-active .app { padding-top: var(--header-height); }
+@media (max-width: 768px) { body.solid-header-active .app { padding-top: 0; } }
+
 /* Header styles */
 .header { position: fixed; top: 0; left: 0; right: 0; z-index: 100; transition: background-color var(--menu-dur) var(--menu-ease), border-color var(--menu-dur) var(--menu-ease), color var(--menu-dur) var(--menu-ease), transform 0.3s ease; will-change: background-color, border-color, transform; }
 .header.hidden { transform: translateY(-100%); }
 .header.hidden .header-logo { opacity: 0; visibility: hidden; }
-.header.solid { background: transparent; border-bottom: 1px solid transparent; color: var(--fg); }
+.header.solid { background: var(--surface); border-bottom: 1px solid var(--border); color: var(--fg); }
 .header.scrolled { background: var(--surface); border-bottom: 1px solid var(--border); }
 .header.scrolled .nav-link { color: var(--fg); text-shadow: none; border-right: 1px solid var(--border); }
 .header.scrolled .nav-item:last-child .nav-link { border-right: none; }
 .header-container { max-width: var(--container-max); margin: 0 auto; padding: 0; height: var(--header-height); display: flex; align-items: center; justify-content: flex-end; position: relative; }
-.header-logo { position: fixed; top: 2rem; left: 0; z-index: 99; display: flex; align-items: center; height: var(--header-height); padding: 0 2rem; transition: opacity 0.3s ease, visibility 0.3s ease, top 0.3s ease; }
+.header-logo { position: fixed; top: 2rem; left: 0; z-index: 99; display: flex; align-items: center; height: var(--header-height); padding: 0 2rem; transition: opacity 0.3s ease, visibility 0.3s ease, top 0.3s ease, left 0.3s ease, transform 0.3s ease; }
 .header-logo img { height: 120px; width: auto; display: block; }
+.header.solid .header-logo { top: 0.1rem; }
+.header.solid .header-logo img { height: 60px; }
 .header.scrolled .header-logo { top: 0.1rem; }
 .header.scrolled .header-logo img { height: 60px; }
 .menu-toggle { display: none; background: none; border: none; cursor: pointer; padding: .5rem; color: #fff; }
@@ -26,17 +53,20 @@ body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantare
 	.nav-link { font-size: 0.9rem; padding: 0 0.75rem; }
 	.header-logo { transition: top 0.3s ease; }
 	.header-logo img { transition: height 0.3s ease; }
-	.header:has(.nav-item.expanded) .header-logo {
-		top: 0.3rem;
-	}
-	.header:has(.nav-item.expanded) .header-logo img {
-		height: 70px;
-	}
 	/* In medium screens, always show logo when header is visible */
 	.header.scrolled .header-logo {
 		opacity: 1;
 		visibility: visible;
 	}
+}
+
+/* Wide screens: center logo between left margin and dropdown panel */
+@media (min-width: 1201px) {
+  .header:has(.nav-item.expanded) .header-logo {
+    /* Midpoint between viewport left edge and container left edge */
+    left: calc((100vw - var(--container-max)) / 4);
+    transform: translateX(-50%);
+  }
 }
 
 /* Desktop hover: highlight individual nav buttons instead of whole header */
@@ -63,10 +93,75 @@ body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantare
 .nav-list { list-style: none; margin: 0; padding: 0; display: flex; gap: 0; width: 100%; }
 .nav-item { position: relative; flex: 1; display: flex; margin-right: -1px; }
 .nav-item:last-child { margin-right: 0; }
+/* Header search button aligned to screen right (desktop only) */
+@media (min-width: 769px) {
+	.header-search-btn {
+		position: fixed;
+		top: 0;
+		right: 1rem;
+		z-index: 103; /* above header (100) and dropdown (102) */
+		height: var(--header-height);
+		width: 44px;
+		display: grid; place-items: center;
+		background: none; border: none; cursor: pointer;
+		color: #fff;
+	}
+	.header.solid ~ .header-search-btn,
+	.header.solid .header-search-btn,
+	.header.scrolled ~ .header-search-btn,
+	.header.scrolled .header-search-btn {
+		color: var(--fg);
+	}
+}
 .nav-link { color: #fff; text-decoration: none; font-weight: 500; text-shadow: 0 1px 2px rgba(0,0,0,0.5); background: none; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: .25rem; width: 100%; padding: .75rem 1rem; border-right: 1px solid transparent; transition: background-color .2s ease, border-color .2s ease; }
 .header.solid .nav-link { color: var(--fg); text-shadow: none; border-right: 1px solid var(--border); }
 .header.scrolled .nav-link { border-right: 1px solid var(--border); }
 .nav-item:last-child .nav-link { border-right: none; }
+.nav-item--search .nav-link { border-right: none; padding: 0 0.75rem; width: auto; }
+.nav-search { height: var(--header-height); display: flex; align-items: center; justify-content: center; }
+
+/* Desktop search open state */
+@media (min-width: 769px) {
+	.header-nav.search-open {
+		background: var(--surface-2);
+		border-bottom: 1px solid var(--border);
+	}
+	.header-nav.search-open .nav-item { display: none; }
+	/* Fill the header container width exactly */
+	.nav-searchbar {
+		position: absolute;
+		left: 0; right: 0;
+		z-index: 103;
+		display: grid;
+		grid-template-columns: 1fr 44px;
+		align-items: center;
+		gap: .5rem;
+		width: 100%;
+		max-width: 100%;
+		margin: 0;
+		height: var(--header-height);
+		padding: 0 .75rem;
+	}
+	.nav-search-toggle {
+		background: none;
+		border: none;
+		height: 40px; width: 40px;
+		border-radius: 999px;
+		display: grid; place-items: center;
+		cursor: pointer;
+		color: inherit;
+	}
+	.nav-search-input {
+		height: 44px;
+		border-radius: 999px;
+		border: 1px solid var(--border);
+		padding: 0 1rem;
+		background: #fff;
+		color: inherit;
+		width: 100%;
+		font: inherit;
+	}
+}
 .nav-link.active { color: #0ea5e9; }
 /* Tablets and medium screens: same hover behavior as desktop */
 @media (min-width: 769px) {
@@ -113,6 +208,7 @@ body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantare
 .header.solid .dropdown-link:hover { color: inherit; }
 
 @media (max-width: 768px) {
+	.header-search-btn { display: none; }
 	/* Overlay mode: transparent header bar on mobile */
 	.header { background: transparent; }
 	/* Solid mode: also transparent on mobile */
