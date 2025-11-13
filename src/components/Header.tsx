@@ -129,7 +129,10 @@ export default function Header() {
     const handleClickOutside = (event: MouseEvent) => {
       const target = event.target as HTMLElement
       if (target.closest('.nav-searchbar')) return
-      setIsSearchOpen(false)
+      // Close search with animation like the X button
+      setSearchAnim(false)
+      document.body.classList.remove('menu-blur')
+      setTimeout(() => setIsSearchOpen(false), 700)
     }
 
     document.addEventListener('click', handleClickOutside, true)
@@ -151,13 +154,22 @@ export default function Header() {
           <img src={mode === 'solid' ? "/logo2.png" : (hasScrolled && isVisible ? "/logo2.png" : "/logo3.png")} alt="CRUB" />
         </Link>
 
-        <button 
+        {/* <button 
           className="menu-toggle" 
           onClick={() => setIsMenuOpen(!isMenuOpen)}
           aria-label={isMenuOpen ? 'Cerrar menú' : 'Abrir menú'}
         >
           {isMenuOpen ? <X size={24} /> : <MenuIcon size={24} />}
-        </button>
+        </button> */}
+
+        {/* Mobile search bar - positioned above menu on mobile */}
+        <div className={`mobile-search-container ${isMenuOpen ? 'show' : ''}`}>
+          <input
+            type="search"
+            className="mobile-search-input"
+            placeholder="Escribí lo que quieras buscar..."
+          />
+        </div>
 
         <nav className={`header-nav ${isMenuOpen ? 'open' : ''} ${isSearchOpen ? 'search-open' : ''}`}>
           <ul className="nav-list">
@@ -170,7 +182,7 @@ export default function Header() {
                   className={`nav-link dropdown-trigger ${openDropdown === group.titulo ? 'active' : ''}`}
                   onClick={() => toggleDropdown(group.titulo)}
                 >
-                  {group.titulo}
+                  <span>{group.titulo}</span>
                 </button>
                 <div className={`dropdown ${openDropdown === group.titulo ? 'open' : ''}`}>
                   <div className="dropdown-content">
@@ -234,29 +246,63 @@ export default function Header() {
             onClick={() => {
               setIsSearchOpen(true)
               setOpenDropdown(null)
-              setSearchAnim(true)
-              window.setTimeout(() => setSearchAnim(false), 250)
+              // Trigger animation after a small delay to ensure DOM is ready
+              requestAnimationFrame(() => {
+                setSearchAnim(true)
+              })
             }}
           >
-            <Search size={20} />
+            <Search size={24} strokeWidth={3} />
           </button>
         )}
         {isSearchOpen && (
           <div className={`nav-searchbar ${searchAnim ? 'animating' : ''}`}>
-            <input
-              type="search"
-              className="nav-search-input"
-              placeholder="Buscar…"
-              autoFocus
-            />
-            <button
-              type="button"
-              className="nav-search-toggle"
-              aria-label="Cerrar búsqueda"
-              onClick={() => setIsSearchOpen(false)}
-            >
-              <X size={18} />
-            </button>
+            <div className="search-input-wrapper">
+              <input
+                type="search"
+                className="nav-search-input"
+                placeholder="Escribí lo que quieras buscar..."
+                autoFocus
+              />
+              <button
+                type="button"
+                className="nav-search-toggle"
+                aria-label="Cerrar búsqueda"
+                onClick={() => {
+                  setSearchAnim(false)
+                  // Remove blur immediately
+                  document.body.classList.remove('menu-blur')
+                  // Wait for animation to complete before hiding
+                  setTimeout(() => setIsSearchOpen(false), 700)
+                }}
+              >
+                <X size={18} />
+              </button>
+            </div>
+            <div className="search-suggestions-content">
+              <div>
+                <h3 className="search-section-title">Enlaces rápidos</h3>
+                <ul className="search-quick-links">
+                  <li><Link to="/estudiantes" onClick={() => setIsSearchOpen(false)}>Estudiantes</Link></li>
+                  <li><Link to="/docentes" onClick={() => setIsSearchOpen(false)}>Docentes</Link></li>
+                  <li><Link to="/nodocentes" onClick={() => setIsSearchOpen(false)}>No Docentes</Link></li>
+                  <li><Link to="/personas-graduadas" onClick={() => setIsSearchOpen(false)}>Personas Graduadas</Link></li>
+                </ul>
+              </div>
+              <div>
+                <h3 className="search-section-title">Búsquedas más comunes</h3>
+                <ul className="search-common-queries">
+                  <li><button type="button">Inscripciones</button></li>
+                  <li><button type="button">Calendario académico</button></li>
+                  <li><button type="button">Mesa de exámenes</button></li>
+                  <li><button type="button">Carreras de grado</button></li>
+                  <li><button type="button">Becas</button></li>
+                  <li><button type="button">Trámites</button></li>
+                  <li><button type="button">Contacto</button></li>
+                  <li><button type="button">Biblioteca</button></li>
+                </ul>
+              </div>
+            </div>
           </div>
         )}
       </div>

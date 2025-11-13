@@ -75,13 +75,13 @@ export default function Footer() {
               <p>Email: crub@uncoma.edu.ar</p>
             </div>
             <div className="footer-social">
-              <a href="https://www.facebook.com/crubunc" target="_blank" rel="noopener noreferrer" aria-label="Facebook">
+              <a href="https://www.facebook.com/UncoBariloche/" target="_blank" rel="noopener noreferrer" aria-label="Facebook">
                 <Facebook size={24} />
               </a>
-              <a href="https://www.instagram.com/crubunc" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
+              <a href="https://www.instagram.com/uncobariloche/?hl=es" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
                 <Instagram size={24} />
               </a>
-              <a href="https://www.youtube.com/@crubunc" target="_blank" rel="noopener noreferrer" aria-label="YouTube">
+              <a href="https://www.youtube.com/c/Comunicaci%C3%B3nUNCoBariloche" target="_blank" rel="noopener noreferrer" aria-label="YouTube">
                 <Youtube size={24} />
               </a>
             </div>

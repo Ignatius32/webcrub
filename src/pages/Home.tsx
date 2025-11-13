@@ -1,32 +1,14 @@
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import { useLocation } from 'react-router-dom'
-import { fetchNovedades, type Novedad, loadHomeHeroItems } from '@/services/strapi'
-import { withBaseURL } from '@/utils/urls'
+import { loadHomeHeroItems } from '@/services/strapi'
 import { Link } from 'react-router-dom'
 import { BookOpen, UsersRound, Briefcase, Award } from 'lucide-react'
 import AgendaHome from '@/components/AgendaHome'
+import NovedadesHome from '@/components/NovedadesHome'
 import Hero from '@/components/Hero'
 
 export function Home() {
   const location = useLocation() as { state?: { anchor?: string } }
-  const [novedades, setNovedades] = useState<Novedad[]>([])
-
-  useEffect(() => {
-    let active = true
-    Promise.all([fetchNovedades()])
-      .then(([novs]) => {
-        if (!active) return
-        setNovedades(novs)
-      })
-      .catch((e: unknown) => {
-        const msg = e instanceof Error ? e.message : 'Unknown error'
-        // eslint-disable-next-line no-console
-        console.error('Error loading novedades', msg)
-      })
-    return () => {
-      active = false
-    }
-  }, [])
 
   // If we were navigated with an anchor state, scroll to that element smoothly
   useEffect(() => {
@@ -43,67 +25,95 @@ export function Home() {
     <main>
       <Hero loadItems={loadHomeHeroItems} badge="" />
 
-      <section className="container novedades">
-        <h2>Novedades</h2>
-        {novedades.length === 0 ? (
-          <p>No hay novedades</p>
-        ) : (
-          <ul className="novedades-grid">
-            {novedades.slice(0, 3).map((n) => {
-              const img = n.imagenPrincipal?.formats?.thumbnail?.url || n.imagenPrincipal?.url || null
-              const imgUrl = img ? withBaseURL(img) : null
-              const docId = n.slug || n.documentId || String(n.id)
-              return (
-                <li key={n.id} className="novedad-card">
-                  <Link to={`/novedades/${docId}`} className="novedad-link">
-                    {imgUrl && <img src={imgUrl} alt={n.imagenPrincipal?.alternativeText || n.titulo || ''} />}
-                    <div className="novedad-body">
-                      <span className="chip">{n.categoria?.nombre || 'novedad'}</span>
-                      <h3 className="novedad-title">{n.titulo || `Novedad #${n.id}`}</h3>
-                    </div>
-                  </Link>
-                </li>
-              )
-            })}
-          </ul>
-        )}
+      <section className="quick-links-hero">
+        <ul className="ql-list-hero" aria-label="Accesos rápidos">
+          <li>
+            <Link to="/estudiantes" className="ql-item ql-estudiantes">
+              <span className="ql-label">ESTUDIANTES</span>
+            </Link>
+          </li>
+          <li>
+            <Link to="/docentes" className="ql-item ql-docentes">
+              <span className="ql-label">DOCENTES</span>
+            </Link>
+          </li>
+          <li>
+            <Link to="/nodocentes" className="ql-item ql-nodocentes">
+              <span className="ql-label">NODOCENTES</span>
+            </Link>
+          </li>
+          <li>
+            <Link to="/personas-graduadas" className="ql-item ql-graduadas">
+              <span className="ql-label">PERSONAS GRADUADAS</span>
+            </Link>
+          </li>
+        </ul>
       </section>
-        <section className="container quick-links">
-          <ul className="ql-list" aria-label="Accesos rápidos">
-            <li>
-              <Link to="/estudiantes" className="ql-item ql-estudiantes">
-                <span className="ql-icon" aria-hidden>
-                  <BookOpen size={36} strokeWidth={2} />
-                </span>
-                <span className="ql-label">Estudiantes</span>
-              </Link>
-            </li>
-            <li>
-              <Link to="/docentes" className="ql-item ql-docentes">
-                <span className="ql-icon" aria-hidden>
-                  <UsersRound size={36} strokeWidth={2} />
-                </span>
-                <span className="ql-label">Docentes</span>
-              </Link>
-            </li>
-            <li>
-              <Link to="/nodocentes" className="ql-item ql-nodocentes">
-                <span className="ql-icon" aria-hidden>
-                  <Briefcase size={36} strokeWidth={2} />
-                </span>
-                <span className="ql-label">Nodocentes</span>
-              </Link>
-            </li>
-            <li>
-              <Link to="/personas-graduadas" className="ql-item ql-graduadas">
-                <span className="ql-icon" aria-hidden>
-                  <Award size={36} strokeWidth={2} />
-                </span>
-                <span className="ql-label">Personas graduadas</span>
-              </Link>
-            </li>
-          </ul>
-        </section>
+
+      <NovedadesHome />
+
+      <section className="gallery-section">
+        <div className="gallery-carousel-container">
+          <div className="gallery-carousel-wrapper">
+            <div className="gallery-carousel">
+              <img src="https://picsum.photos/400/300?random=1" alt="Gallery 1" />
+              <img src="https://picsum.photos/400/300?random=2" alt="Gallery 2" />
+              <img src="https://picsum.photos/400/300?random=3" alt="Gallery 3" />
+              <img src="https://picsum.photos/400/300?random=4" alt="Gallery 4" />
+              <img src="https://picsum.photos/400/300?random=5" alt="Gallery 5" />
+              <img src="https://picsum.photos/400/300?random=1" alt="Gallery 1" />
+              <img src="https://picsum.photos/400/300?random=2" alt="Gallery 2" />
+              <img src="https://picsum.photos/400/300?random=3" alt="Gallery 3" />
+              <img src="https://picsum.photos/400/300?random=4" alt="Gallery 4" />
+              <img src="https://picsum.photos/400/300?random=5" alt="Gallery 5" />
+              <img src="https://picsum.photos/400/300?random=1" alt="Gallery 1" />
+              <img src="https://picsum.photos/400/300?random=2" alt="Gallery 2" />
+              <img src="https://picsum.photos/400/300?random=3" alt="Gallery 3" />
+              <img src="https://picsum.photos/400/300?random=4" alt="Gallery 4" />
+              <img src="https://picsum.photos/400/300?random=5" alt="Gallery 5" />
+            </div>
+            <div className="gallery-carousel gallery-carousel-reverse">
+              <img src="https://picsum.photos/400/300?random=6" alt="Gallery 6" />
+              <img src="https://picsum.photos/400/300?random=7" alt="Gallery 7" />
+              <img src="https://picsum.photos/400/300?random=8" alt="Gallery 8" />
+              <img src="https://picsum.photos/400/300?random=9" alt="Gallery 9" />
+              <img src="https://picsum.photos/400/300?random=10" alt="Gallery 10" />
+              <img src="https://picsum.photos/400/300?random=6" alt="Gallery 6" />
+              <img src="https://picsum.photos/400/300?random=7" alt="Gallery 7" />
+              <img src="https://picsum.photos/400/300?random=8" alt="Gallery 8" />
+              <img src="https://picsum.photos/400/300?random=9" alt="Gallery 9" />
+              <img src="https://picsum.photos/400/300?random=10" alt="Gallery 10" />
+              <img src="https://picsum.photos/400/300?random=6" alt="Gallery 6" />
+              <img src="https://picsum.photos/400/300?random=7" alt="Gallery 7" />
+              <img src="https://picsum.photos/400/300?random=8" alt="Gallery 8" />
+              <img src="https://picsum.photos/400/300?random=9" alt="Gallery 9" />
+              <img src="https://picsum.photos/400/300?random=10" alt="Gallery 10" />
+            </div>
+            <div className="gallery-carousel">
+              <img src="https://picsum.photos/400/300?random=11" alt="Gallery 11" />
+              <img src="https://picsum.photos/400/300?random=12" alt="Gallery 12" />
+              <img src="https://picsum.photos/400/300?random=13" alt="Gallery 13" />
+              <img src="https://picsum.photos/400/300?random=14" alt="Gallery 14" />
+              <img src="https://picsum.photos/400/300?random=15" alt="Gallery 15" />
+              <img src="https://picsum.photos/400/300?random=11" alt="Gallery 11" />
+              <img src="https://picsum.photos/400/300?random=12" alt="Gallery 12" />
+              <img src="https://picsum.photos/400/300?random=13" alt="Gallery 13" />
+              <img src="https://picsum.photos/400/300?random=14" alt="Gallery 14" />
+              <img src="https://picsum.photos/400/300?random=15" alt="Gallery 15" />
+              <img src="https://picsum.photos/400/300?random=11" alt="Gallery 11" />
+              <img src="https://picsum.photos/400/300?random=12" alt="Gallery 12" />
+              <img src="https://picsum.photos/400/300?random=13" alt="Gallery 13" />
+              <img src="https://picsum.photos/400/300?random=14" alt="Gallery 14" />
+              <img src="https://picsum.photos/400/300?random=15" alt="Gallery 15" />
+            </div>
+          </div>
+          <div className="gallery-content">
+            <h2 className="gallery-title">Oferta Académica</h2>
+            <Link to="/carreras" className="gallery-button">Conocé nuestras Carreras</Link>
+          </div>
+        </div>
+      </section>
+
       <AgendaHome />
     </main>
   )
