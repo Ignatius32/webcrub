@@ -256,8 +256,8 @@ export default function Header() {
           </button>
         )}
         {isSearchOpen && (
-          <div className={`nav-searchbar ${searchAnim ? 'animating' : ''}`}>
-            <div className="search-input-wrapper">
+          <div className={`search-panel ${searchAnim ? 'animating' : ''}`}>
+            <div className="nav-searchbar">
               <input
                 type="search"
                 className="nav-search-input"
@@ -279,8 +279,8 @@ export default function Header() {
                 <X size={18} />
               </button>
             </div>
-            <div className="search-suggestions-content">
-              <div>
+            <div className="search-suggestions">
+              <div className="search-suggestions-content">
                 <h3 className="search-section-title">Enlaces rápidos</h3>
                 <ul className="search-quick-links">
                   <li><Link to="/estudiantes" onClick={() => setIsSearchOpen(false)}>Estudiantes</Link></li>
@@ -288,8 +288,6 @@ export default function Header() {
                   <li><Link to="/nodocentes" onClick={() => setIsSearchOpen(false)}>No Docentes</Link></li>
                   <li><Link to="/personas-graduadas" onClick={() => setIsSearchOpen(false)}>Personas Graduadas</Link></li>
                 </ul>
-              </div>
-              <div>
                 <h3 className="search-section-title">Búsquedas más comunes</h3>
                 <ul className="search-common-queries">
                   <li><button type="button">Inscripciones</button></li>

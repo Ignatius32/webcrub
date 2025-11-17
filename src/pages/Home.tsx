@@ -1,14 +1,19 @@
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 import { useLocation } from 'react-router-dom'
 import { loadHomeHeroItems } from '@/services/strapi'
 import { Link } from 'react-router-dom'
 import { BookOpen, UsersRound, Briefcase, Award } from 'lucide-react'
 import AgendaHome from '@/components/AgendaHome'
 import NovedadesHome from '@/components/NovedadesHome'
+import NewsletterParallax from '@/components/NewsletterParallax'
 import Hero from '@/components/Hero'
 
 export function Home() {
   const location = useLocation() as { state?: { anchor?: string } }
+  const novedadesRef = useRef<HTMLDivElement>(null)
+  const galleryRef = useRef<HTMLElement>(null)
+  const agendaRef = useRef<HTMLDivElement>(null)
+  const newsletterRef = useRef<HTMLDivElement>(null)
 
   // If we were navigated with an anchor state, scroll to that element smoothly
   useEffect(() => {
@@ -20,6 +25,40 @@ export function Home() {
     }, 0)
     return () => clearTimeout(t)
   }, [location.state])
+
+  // Scroll animation observer
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('visible')
+          }
+        })
+      },
+      {
+        threshold: 0.1,
+        rootMargin: '0px'
+      }
+    )
+
+    const elements = [
+      novedadesRef.current,
+      galleryRef.current,
+      agendaRef.current,
+      newsletterRef.current
+    ]
+
+    elements.forEach((el) => {
+      if (el) observer.observe(el)
+    })
+
+    return () => {
+      elements.forEach((el) => {
+        if (el) observer.unobserve(el)
+      })
+    }
+  }, [])
 
   return (
     <main>
@@ -50,9 +89,11 @@ export function Home() {
         </ul>
       </section>
 
-      <NovedadesHome />
+      <div ref={novedadesRef} className="scroll-animate scroll-animate-left">
+        <NovedadesHome />
+      </div>
 
-      <section className="gallery-section">
+      <section ref={galleryRef} className="gallery-section scroll-animate scroll-animate-right">
         <div className="gallery-carousel-container">
           <div className="gallery-carousel-wrapper">
             <div className="gallery-carousel">
@@ -114,7 +155,13 @@ export function Home() {
         </div>
       </section>
 
-      <AgendaHome />
+      <div ref={agendaRef} className="scroll-animate scroll-animate-left">
+        <AgendaHome />
+      </div>
+
+      <div ref={newsletterRef} className="scroll-animate scroll-animate-right">
+        <NewsletterParallax />
+      </div>
     </main>
   )
 }

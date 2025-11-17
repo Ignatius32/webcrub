@@ -10,7 +10,6 @@ import AgendaList from './pages/AgendaList'
 import AgendaDetail from './pages/AgendaDetail'
 import Header from './components/Header'
 import Footer from './components/Footer'
-import NewsletterParallax from './components/NewsletterParallax'
 import FloatingMenuButton from './components/FloatingMenuButton'
 import { HeaderModeProvider, useHeaderMode } from './components/headerMode'
 import { MenuProvider } from './components/menuContext'
@@ -41,7 +40,6 @@ export default function App() {
           <Route path="/pagina/:slug" element={<Pagina />} />
           <Route path="/pagina/:slug/seccion/:sid" element={<Seccion />} />
           </Routes>
-          <NewsletterParallax />
           <Footer />
         </div>
       </HeaderModeProvider>
